@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 40px 15px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #00000015;
+        }
+
+        h1 {
+            text-align: center;
+            color: #254b7a;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input, textarea {
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #2864b4;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .task {
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .task p {
+            color: #555;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions form {
+            flex: 1;
+        }
+
+        .delete {
+            background: #d64545;
+        }
+
+        .empty {
+            text-align: center;
+            color: gray;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Student Task Manager</h1>
+        <p>Organize your studies, one task at a time!</p>
+
+        <form action="{{ url_for('add_task') }}" method="POST">
+            <input type="text" name="title"
+                   placeholder="Enter task title" required>
+
+            <textarea name="description"
+                      placeholder="Enter task description (optional)"
+                      rows="3"></textarea>
+
+            <button type="submit">Add Task</button>
+        </form>
+
+        <h2>My Tasks</h2>
+
+        {% if tasks %}
+            {% for task in tasks %}
+                <div class="task">
+                    <h3 class="{{ 'completed' if task['completed'] else '' }}">
+                        {{ task['title'] }}
+                    </h3>
+
+                    <p>{{ task['description'] or 'No description' }}</p>
+
+                    <p>
+                        Status:
+                        {{ 'Completed' if task['completed'] else 'Pending' }}
+                    </p>
+
+                    <div class="actions">
+                        <form action="{{ url_for('toggle_task', task_id=task['id']) }}"
+                              method="POST">
+                            <button type="submit">
+                                {{ 'Undo' if task['completed'] else 'Complete' }}
+                            </button>
+                        </form>
+
+                        <form action="{{ url_for('delete_task', task_id=task['id']) }}"
+                              method="POST"
+                              onsubmit="return confirm('Delete this task?')">
+                            <button type="submit" class="delete">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">No tasks yet. Add your first task above!</p>
+        {% endif %}
+    </div>
+</body>
+</html>
